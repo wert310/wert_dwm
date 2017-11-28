@@ -56,7 +56,7 @@ static const char *scratchpadcmd[] = { "termite", "--geometry", "1024x600", "-t"
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { "termite", NULL };
 /* custom cmds */
-static const char *suspendcmd[] = {"sudo", "systemctl", "suspend", NULL };
+static const char *suspendcmd[] = {"systemctl", "suspend", NULL };
 static const char *volumeupcmd[] = {"/opt/dwm/volume.sh", "up",  NULL};
 static const char *volumedowncmd[] = {"/opt/dwm/volume.sh", "down", NULL};
 static const char *volumetogglecmd[] = {"/opt/dwm/volume.sh", "toggle", NULL};
@@ -79,6 +79,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
     { MODKEY,                       XK_F4,     killclient,     {0} },                   /* A-F4 kill client*/
+    { MODKEY,                       XF86XK_PowerOff, spawn,       {.v = suspendcmd } },
     { 0,                            XF86XK_Sleep, spawn,       {.v = suspendcmd } },    /* suspend FN-F4 */
     { 0,                            XF86XK_AudioLowerVolume, spawn, {.v = volumedowncmd } }, /* volume down key */
     { 0,                            XF86XK_AudioRaiseVolume, spawn, {.v = volumeupcmd } },  /* vlume up key */
