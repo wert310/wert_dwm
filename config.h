@@ -13,6 +13,7 @@ static const char selfgcolor[]      = "#eeeeee";
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappx     = 5;        /* useless gap between windows */
+static const Bool monoclegap        = True;     /* show gap in monocle and single window mode */
 static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
 
