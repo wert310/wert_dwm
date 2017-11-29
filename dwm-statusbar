@@ -1,0 +1,54 @@
+#!/bin/bash
+
+mem() {
+    mem_used="$(free -h | grep 'Mem' | cut -c28-31)"
+    mem_total="$(free -h | grep Mem | cut -c16-19)"
+    echo -ne "Î ${mem_used}/${mem_total}"
+}
+
+power() {
+  status="$(cat /sys/class/power_supply/AC/online)"
+  battery="$(cat /sys/class/power_supply/BAT0/capacity)"
+  if [ "${status}" == 1 ]; then
+    echo -ne "Â ${battery}%"
+  else
+    echo -ne "ð ${battery}%"
+  fi
+}
+
+wifi() {
+  ssid="$(iwgetid -r)"
+  if [ ${ssid} ]; then
+    echo -ne "¤ ${ssid}"
+  else
+    echo -ne "¤ NO NETWORK"
+  fi
+}
+
+hddfree() {
+  hddfree="$(df -Ph /dev/sda1 | awk '$3 ~ /[0-9]+/ {print $4}')"
+  echo -ne "¨ ${hddfree}"
+}
+
+volume(){
+    mix=`amixer get Master | tail -1`
+    vol="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
+    if [[ $mix == *\[off\]* ]]; then
+      echo -en "í OFF"
+    elif [[ $mix == *\[on\]* ]]; then
+      echo -en "í ${vol}%"
+    else
+      echo -en "í --"
+    fi
+ }
+
+datetime() {
+  datetime="$(date "+%d/%m/%Y %H:%M:%S")"
+  echo -ne "É ${datetime}"
+}
+
+
+while true; do
+  xsetroot -name "$(mem)  $(hddfree)  $(wifi)  $(volume)  $(power)  $(datetime)"
+  sleep 1
+done

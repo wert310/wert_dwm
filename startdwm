@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# wert_dwm startup script
+# requirements: wmname feh compton qt5ct
+
+export QT_QPA_PLATFORMTHEME="qt5ct"
+ 
+xset +fp ~/.dwm/fonts/
+xset fp rehash
+
+xbacklight -set 16
+setxkbmap it
+
+wmname LG3D
+compton -b
+
+feh --bg-scale ~/.dwm/images/bg.jpg
+
+~/.dwm/dwm-statusbar &
+exec ~/.dwm/dwm
