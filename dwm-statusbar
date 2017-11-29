@@ -31,14 +31,10 @@ hddfree() {
 }
 
 volume(){
-    mix=`amixer get Master | tail -1`
-    vol="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
-    if [[ $mix == *\[off\]* ]]; then
+    if pamixer --get-mute >/dev/null; then
       echo -en "í OFF"
-    elif [[ $mix == *\[on\]* ]]; then
-      echo -en "í ${vol}%"
     else
-      echo -en "í --"
+      echo -en "í $(pamixer --get-volume)%"
     fi
  }
 
