@@ -5,12 +5,12 @@
 /* appearance */
 static const char font[]            = "-*-tamsynmod-medium-r-*-*-14-*-*-*-*-*-*-*";
                                       // "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
-static const char normbordercolor[] = "#444444";
-static const char normbgcolor[]     = "#222222";
-static const char normfgcolor[]     = "#bbbbbb";
-static const char selbordercolor[]  = "#005577";
-static const char selbgcolor[]      = "#005577";
-static const char selfgcolor[]      = "#eeeeee";
+static const char normbordercolor[] = "#17232e"; // "#444444";
+static const char normbgcolor[]     = "#17232e"; // "#222222";
+static const char normfgcolor[]     = "#ecf0f1"; // "#bbbbbb";
+static const char selbordercolor[]  = "#2c3e50"; // "#005577";
+static const char selbgcolor[]      = "#2c3e50"; // "#005577";
+static const char selfgcolor[]      = "#ecf0f1"; // "#eeeeee";
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappx     = 5;        /* useless gap between windows */
