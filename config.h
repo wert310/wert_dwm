@@ -22,7 +22,8 @@ static const Rule rules[] = {
     /* class            instance  title       tags mask     isfloating   monitor */
     { NULL,             NULL,     NULL,       0,            False,       -1 },
     { "Keepassx2",      NULL,     NULL,       0,            True,        -1 },
-    { "Seafile Client", NULL,     NULL,       0,            True,        -1 }
+    { "Seafile Client", NULL,     NULL,       0,            True,        -1 },
+    { "seafile-applet", NULL,     NULL,       0,            True,        -1 }
 };
 
 /* layout(s) */
@@ -87,10 +88,10 @@ static Key keys[] = {
     { MODKEY,                       XK_t,            togglefloating, {0} },
     { MODKEY,                       XK_0,            view,           {.ui = ~0 } },
     { MODKEY|ShiftMask,             XK_0,            tag,            {.ui = ~0 } },
-    { MODKEY,                       XK_Down,         moveresize,     {.v = (const int[]){0,25,0,0}} },
-    { MODKEY,                       XK_Up,           moveresize,     {.v = (const int[]){0,-25,0,0}} },
-    { MODKEY,                       XK_Right,        moveresize,     {.v = (const int[]){25,0,0,0}} },
-    { MODKEY,                       XK_Left,         moveresize,     {.v = (const int[]){-25,0,0,0}} },
+    { MODKEY|ControlMask,           XK_Down,         moveresize,     {.v = (const int[]){0,25,0,0}} },
+    { MODKEY|ControlMask,           XK_Up,           moveresize,     {.v = (const int[]){0,-25,0,0}} },
+    { MODKEY|ControlMask,           XK_Right,        moveresize,     {.v = (const int[]){25,0,0,0}} },
+    { MODKEY|ControlMask,           XK_Left,         moveresize,     {.v = (const int[]){-25,0,0,0}} },
     { MODKEY|ShiftMask,             XK_Down,         moveresize,     {.v = (const int[]){0,0,0,25}} },
     { MODKEY|ShiftMask,             XK_Up,           moveresize,     {.v = (const int[]){0,0,0,-25}} },
     { MODKEY|ShiftMask,             XK_Right,        moveresize,     {.v = (const int[]){0,0,25,0}} },
