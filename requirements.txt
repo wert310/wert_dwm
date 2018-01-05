@@ -1,0 +1,9 @@
+feh
+comption
+qt5ct
+wmname
+termite
+networkmanager_dmenu
+i3lock
+pamixer
+pulseaudio
