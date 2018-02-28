@@ -549,9 +549,8 @@ void clientmessage(XEvent *e) {
       c->mon->seltags ^= 1;
       c->mon->tagset[c->mon->seltags] = c->tags;
     }
-    // TODO: fixes qt apps switch to master on mouse click
-    // uncomment if it causes problems elsewhere
-    //pop(c);
+    // thiscomment fixes qt apps switch to master on mouse click
+    // pop(c);
   }
 }
 
