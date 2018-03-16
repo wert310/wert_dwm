@@ -7,3 +7,4 @@ networkmanager_dmenu
 i3lock
 pamixer
 pulseaudio
+wireless_tools
