@@ -1,5 +1,6 @@
 feh
 comption
+dunst
 qt5ct
 wmname
 termite

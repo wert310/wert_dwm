@@ -3,17 +3,19 @@
 # wert_dwm startup script
 
 export QT_QPA_PLATFORMTHEME="qt5ct"
+export MOZ_USE_XINPUT2=1
  
 xset +fp ~/.dwm/fonts/
 xset fp rehash
 
-xbacklight -set 16
-setxkbmap it
+xbacklight -set 8
+setxkbmap -variant altgr-intl us
 
 wmname LG3D
 compton -b
+dunst &
 
 feh --bg-scale ~/.dwm/images/bg.jpg
 
 ~/.dwm/dwm-statusbar &
-exec ~/.dwm/dwm
+exec ssh-agent ~/.dwm/dwm

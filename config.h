@@ -19,11 +19,11 @@ static const Bool topbar            = True;     /* False means bottom bar */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
-  /* class            instance  title       tags mask     isfloating   monitor */
-  { NULL,             NULL,     NULL,       0,            False,       -1 },
-  { "Keepassx2",      NULL,     NULL,       0,            True,        -1 },
-  { "Seafile Client", NULL,     NULL,       0,            True,        -1 },
-  { "seafile-applet", NULL,     NULL,       0,            True,        -1 }
+  /* class                  instance  title       tags mask     isfloating   monitor */
+  { NULL,                   NULL,     NULL,       0,            False,       -1 },
+  { "Keepassx",             NULL,     NULL,       0,            True,        -1 },
+  { "Seafile Client",       NULL,     NULL,       0,            True,        -1 },
+  { "seafile-applet",       NULL,     NULL,       0,            True,        -1 },
 };
 
 /* layout(s) */
@@ -40,7 +40,7 @@ static const Layout layouts[] = {
 
 /* scratchpad */
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "termite", "--geometry", "1024x600", "-t", scratchpadname, NULL };
+static const char *scratchpadcmd[] = { "termite", "--geometry", "1280x800", "-t", scratchpadname, NULL };
 
 /* key definitions */
 #define MODKEY Mod1Mask
@@ -59,54 +59,55 @@ static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, 
 static const char *termcmd[]  = { "termite", NULL };
 
 static Key keys[] = {
-  /* modifier                     key              function        argument */
-  { MODKEY,                       XK_p,            spawn,          {.v = dmenucmd } },
-  { MODKEY|ShiftMask,             XK_Return,       spawn,          {.v = termcmd } },
-  { MODKEY|ControlMask,           XK_t,            spawn,          {.v = termcmd } },
-  { 0,                            XK_F10,          togglescratch,  {.v = scratchpadcmd } },
-  { MODKEY,                       XK_o,            spawn,          CMD("networkmanager_dmenu") },
-  { MODKEY,                       XF86XK_PowerOff, spawn,          CMD("systemctl", "suspend") },
-  { MODKEY,                       XK_F6,           spawn,          CMD("xbacklight", "-8") },
-  { MODKEY,                       XK_F7,           spawn,          CMD("xbacklight", "+8") },
-  { MODKEY,                       XK_F8,           spawn,          CMD("pamixer", "-t") },
-  { MODKEY,                       XK_F9,           spawn,          CMD("pamixer", "-d", "10") },
-  { MODKEY,                       XK_F10,          spawn,          CMD("pamixer", "-i", "10") },
-  { MODKEY|ControlMask,           XK_l,            spawn,          CMD("i3lock", "-nec", normbgcolor) },
-  { MODKEY,                       XK_b,            togglebar,      {0} },
-  { MODKEY,                       XK_j,            focusstack,     {.i = +1 } },
-  { MODKEY,                       XK_k,            focusstack,     {.i = -1 } },
-  { MODKEY,                       XK_comma,        incnmaster,     {.i = +1 } },
-  { MODKEY,                       XK_period,       incnmaster,     {.i = -1 } },
-  { MODKEY,                       XK_h,            setmfact,       {.f = -0.05} },
-  { MODKEY,                       XK_l,            setmfact,       {.f = +0.05} },
-  { MODKEY|ShiftMask,             XK_space,        setmfact,       {.f = 1 + MFACT} },
-  { MODKEY,                       XK_space,        tagmon,         {.i = +1} },
-  { MODKEY,                       XK_Return,       zoom,           {0} },
-  { MODKEY,                       XK_Tab,          view,           {0} },
-  { MODKEY|ShiftMask,             XK_c,            killclient,     {0} },
-  { MODKEY,                       XK_F4,           killclient,     {0} },
-  { MODKEY,                       XK_m,            setlayout,      {0} },
-  { MODKEY,                       XK_t,            togglefloating, {0} },
-  { MODKEY,                       XK_0,            view,           {.ui = ~0 } },
-  { MODKEY|ShiftMask,             XK_0,            tag,            {.ui = ~0 } },
-  { MODKEY|ControlMask,           XK_Down,         moveresize,     {.v = (const int[]){0,25,0,0}} },
-  { MODKEY|ControlMask,           XK_Up,           moveresize,     {.v = (const int[]){0,-25,0,0}} },
-  { MODKEY|ControlMask,           XK_Right,        moveresize,     {.v = (const int[]){25,0,0,0}} },
-  { MODKEY|ControlMask,           XK_Left,         moveresize,     {.v = (const int[]){-25,0,0,0}} },
-  { MODKEY|ShiftMask,             XK_Down,         moveresize,     {.v = (const int[]){0,0,0,25}} },
-  { MODKEY|ShiftMask,             XK_Up,           moveresize,     {.v = (const int[]){0,0,0,-25}} },
-  { MODKEY|ShiftMask,             XK_Right,        moveresize,     {.v = (const int[]){0,0,25,0}} },
-  { MODKEY|ShiftMask,             XK_Left,         moveresize,     {.v = (const int[]){0,0,-25,0}} },
-  TAGKEYS(                        XK_1,                            0)
-  TAGKEYS(                        XK_2,                            1)
-  TAGKEYS(                        XK_3,                            2)
-  TAGKEYS(                        XK_4,                            3)
-  TAGKEYS(                        XK_5,                            4)
-  TAGKEYS(                        XK_6,                            5)
-  TAGKEYS(                        XK_7,                            6)
-  TAGKEYS(                        XK_8,                            7)
-  TAGKEYS(                        XK_9,                            8)
-  { MODKEY|ShiftMask,             XK_q,            quit,           {0} },
+  /* modifier                     key                  function        argument */
+  { MODKEY,                       XK_p,                spawn,          {.v = dmenucmd } },
+  { MODKEY|ShiftMask,             XK_Return,           spawn,          {.v = termcmd } },
+  { MODKEY|ControlMask,           XK_t,                spawn,          {.v = termcmd } },
+  { 0,                            XK_F10,              togglescratch,  {.v = scratchpadcmd } },
+  { MODKEY,                       XK_o,                spawn,          CMD("networkmanager_dmenu") },
+  { MODKEY,                       XK_F12,              spawn,          CMD("systemctl", "suspend") },
+  { MODKEY,                       XK_F5,               spawn,          CMD("xbacklight", "-8") },
+  { MODKEY,                       XK_F6,               spawn,          CMD("xbacklight", "+8") },
+  { MODKEY,                       XK_F1,               spawn,          CMD("pamixer", "-t") },
+  { MODKEY,                       XK_F2,               spawn,          CMD("pamixer", "-d", "10") },
+  { MODKEY,                       XK_F3,               spawn,          CMD("pamixer", "-i", "10") },
+  { 0,                            XF86XK_AudioMicMute, spawn,          CMD("pavucontrol-qt", "-t", "4") },
+  { MODKEY|ControlMask,           XK_l,                spawn,          CMD("i3lock", "-nec", normbgcolor) },
+  { MODKEY,                       XK_b,                togglebar,      {0} },
+  { MODKEY,                       XK_j,                focusstack,     {.i = +1 } },
+  { MODKEY,                       XK_k,                focusstack,     {.i = -1 } },
+  { MODKEY,                       XK_comma,            incnmaster,     {.i = +1 } },
+  { MODKEY,                       XK_period,           incnmaster,     {.i = -1 } },
+  { MODKEY,                       XK_h,                setmfact,       {.f = -0.05} },
+  { MODKEY,                       XK_l,                setmfact,       {.f = +0.05} },
+  { MODKEY|ShiftMask,             XK_space,            setmfact,       {.f = 1 + MFACT} },
+  { MODKEY,                       XK_space,            tagmon,         {.i = +1} },
+  { MODKEY,                       XK_Return,           zoom,           {0} },
+  { MODKEY,                       XK_Tab,              view,           {0} },
+  { MODKEY|ShiftMask,             XK_c,                killclient,     {0} },
+  { MODKEY,                       XK_F4,               killclient,     {0} },
+  { MODKEY,                       XK_m,                setlayout,      {0} },
+  { MODKEY,                       XK_t,                togglefloating, {0} },
+  { MODKEY,                       XK_0,                view,           {.ui = ~0 } },
+  { MODKEY|ShiftMask,             XK_0,                tag,            {.ui = ~0 } },
+  { MODKEY|ControlMask,           XK_Down,             moveresize,     {.v = (const int[]){0,25,0,0}} },
+  { MODKEY|ControlMask,           XK_Up,               moveresize,     {.v = (const int[]){0,-25,0,0}} },
+  { MODKEY|ControlMask,           XK_Right,            moveresize,     {.v = (const int[]){25,0,0,0}} },
+  { MODKEY|ControlMask,           XK_Left,             moveresize,     {.v = (const int[]){-25,0,0,0}} },
+  { MODKEY|ShiftMask,             XK_Down,             moveresize,     {.v = (const int[]){0,0,0,25}} },
+  { MODKEY|ShiftMask,             XK_Up,               moveresize,     {.v = (const int[]){0,0,0,-25}} },
+  { MODKEY|ShiftMask,             XK_Right,            moveresize,     {.v = (const int[]){0,0,25,0}} },
+  { MODKEY|ShiftMask,             XK_Left,             moveresize,     {.v = (const int[]){0,0,-25,0}} },
+  TAGKEYS(                        XK_1,                                0)
+  TAGKEYS(                        XK_2,                                1)
+  TAGKEYS(                        XK_3,                                2)
+  TAGKEYS(                        XK_4,                                3)
+  TAGKEYS(                        XK_5,                                4)
+  TAGKEYS(                        XK_6,                                5)
+  TAGKEYS(                        XK_7,                                6)
+  TAGKEYS(                        XK_8,                                7)
+  TAGKEYS(                        XK_9,                                8)
+  { MODKEY|ShiftMask,             XK_q,                quit,           {0} },
 };
 
 /* button definitions */

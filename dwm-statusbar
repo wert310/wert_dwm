@@ -2,8 +2,21 @@
 
 mem() {
     mem_used="$(free -h | grep 'Mem' | cut -c28-31)"
-    mem_total="$(free -h | grep Mem | cut -c16-19)"
+    mem_total="$(free -h | grep Mem | cut -c17-19)"
     echo -ne "Î ${mem_used}/${mem_total}"
+}
+
+BATTERY_NOTIFY_LAST_TIME="$(date +%s)"
+
+battery_notify() {
+  status="$(cat /sys/class/power_supply/AC/online)"
+  battery="$(cat /sys/class/power_supply/BAT0/capacity)"
+  if [[ "${status}" == 0 ]]; then
+    if [ ${battery} -le 20 -a $(($(date +%s) - $BATTERY_NOTIFY_LAST_TIME)) -ge 90 ]; then
+      BATTERY_NOTIFY_LAST_TIME="$(date +%s)"
+      notify-send 'Low Battery!' "Battery Level: ${battery}%" -u critical
+    fi
+  fi
 }
 
 power() {
@@ -26,7 +39,7 @@ wifi() {
 }
 
 hddfree() {
-  hddfree="$(df -Ph /dev/sda1 | awk '$3 ~ /[0-9]+/ {print $4}')"
+  hddfree="$(df -Ph /dev/nvme0n1p2 | awk '$3 ~ /[0-9]+/ {print $4}')"
   echo -ne "¨ ${hddfree}"
 }
 
@@ -43,8 +56,8 @@ datetime() {
   echo -ne "É ${datetime}"
 }
 
-
 while true; do
   xsetroot -name "$(mem)  $(hddfree)  $(wifi)  $(volume)  $(power)  $(datetime)"
+  battery_notify
   sleep 1
 done
