@@ -6,7 +6,7 @@ mem() {
     echo -ne "Î ${mem_used}/${mem_total}"
 }
 
-BATTERY_NOTIFY_LAST_TIME="$(date +%s)"
+BATTERY_NOTIFY_LAST_TIME=0
 
 battery_notify() {
   status="$(cat /sys/class/power_supply/AC/online)"

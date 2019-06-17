@@ -15,7 +15,7 @@ wmname LG3D
 compton -b
 dunst &
 
-feh --bg-scale ~/.dwm/images/bg.jpg
+[[ -e ~/.fehbg ]] && ~/.fehbg || feh --bg-scale ~/.dwm/images/bg.jpg
 
 ~/.dwm/dwm-statusbar &
 exec ssh-agent ~/.dwm/dwm
