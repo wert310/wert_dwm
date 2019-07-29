@@ -7,7 +7,7 @@ allow_bold = true
 dynamic_title = true
 urgent_on_bell = true
 clickable_url = true
-font = Hack 9
+font = Hack 11
 scrollback_lines = 100000
 search_wrap = true
 
@@ -20,32 +20,63 @@ cursor_shape = block
 # Hide links that are no longer valid in url select overlay mode
 filter_unmatched_urls = true
 
+# [colors]
+# #cursor = #dcdccc
+# #cursor_foreground = #dcdccc
+# foreground = #dcdccc
+# foreground_bold = #ffffff
+# highlight = #3f3f3f
+# #background = #1f1f1f
+# #background = rgba(31,31,31, 0.9)
+# background = rgba(23,35,46, 0.9)
+# 
+# # colors from color0 to color254 can be set
+# color0 = #3f3f3f
+# color1 = #705050
+# color2 = #60b48a
+# color3 = #dfaf8f
+# color4 = #506070
+# color5 = #dc8cc3
+# color6 = #8cd0d3
+# color7 = #dcdccc
+# color8 = #709080
+# color9 = #dca3a3
+# color10 = #c3bf9f
+# color11 = #f0dfaf
+# color12 = #94bff3
+# color13 = #ec93d3
+# color14 = #93e0e3
+# color15 = #ffffff
+# 
+
 [colors]
-#cursor = #dcdccc
-#cursor_foreground = #dcdccc
-foreground = #dcdccc
-foreground_bold = #ffffff
-highlight = #3f3f3f
-#background = #1f1f1f
-#background = rgba(31,31,31, 0.9)
-background = rgba(23,35,46, 0.9)
+foreground = #657b83
+foreground_bold = #073642
+#foreground_dim = #888888
+#background = #fdf6e3
+background = rgba(253,246,227,0.9)
+cursor = #586e75
+
+# if unset, will reverse foreground and background
+#highlight = #839496
 
 # colors from color0 to color254 can be set
-color0 = #3f3f3f
-color1 = #705050
-color2 = #60b48a
-color3 = #dfaf8f
-color4 = #506070
-color5 = #dc8cc3
-color6 = #8cd0d3
-color7 = #dcdccc
-color8 = #709080
-color9 = #dca3a3
-color10 = #c3bf9f
-color11 = #f0dfaf
-color12 = #94bff3
-color13 = #ec93d3
-color14 = #93e0e3
-color15 = #ffffff
+color0 = #073642
+color1 = #dc322f
+color2 = #859900
+color3 = #b58900
+color4 = #268bd2
+color5 = #d33682
+color6 = #2aa198
+color7 = #eee8d5
+color8 = #002b36
+color9 = #cb4b16
+color10 = #586e75
+color11 = #657b83
+color12 = #839496
+color13 = #6c71c4
+color14 = #93a1a1
+color15 = #fdf6e3
 
 # vim: ft=dosini cms=#%s
+
