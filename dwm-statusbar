@@ -31,7 +31,7 @@ power() {
 
 wifi() {
   ssid="$(iwgetid -r)"
-  if [ ${ssid} ]; then
+  if [ ! -z "${ssid}" ]; then
     echo -ne "¤ ${ssid}"
   else
     echo -ne "¤ NO NETWORK"

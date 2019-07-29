@@ -2,15 +2,15 @@
 
 /* appearance */
 static const char font[]            = "-*-tamsynmod-medium-r-*-*-14-*-*-*-*-*-*-*";
-static const char normbordercolor[] = "#17232e";
-static const char normbgcolor[]     = "#17232e";
-static const char normfgcolor[]     = "#ecf0f1";
-static const char selbordercolor[]  = "#2c3e50";
-static const char selbgcolor[]      = "#2c3e50";
-static const char selfgcolor[]      = "#ecf0f1";
+static const char normbordercolor[] = "#eee8d5";
+static const char normbgcolor[]     = "#fdf6e3";
+static const char normfgcolor[]     = "#586e75";
+static const char selbordercolor[]  = "#93a1a1";
+static const char selbgcolor[]      = "#657b83";
+static const char selfgcolor[]      = "#eee8d5";
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 8;        /* snap pixel */
-static const unsigned int gappx     = 5;        /* useless gap between windows */
+static const unsigned int gappx     = 10;        /* useless gap between windows */
 static const Bool monoclegap        = True;     /* show gap in monocle and single window mode */
 static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
@@ -36,6 +36,7 @@ static const Layout layouts[] = {
   /* symbol     arrange function */
   { "[]=",      tile },
   { "[M]",      monocle },
+  // { "<><",      NULL }, // no layout -> floating
 };
 
 /* scratchpad */
@@ -46,9 +47,9 @@ static const char *scratchpadcmd[] = { "termite", "--geometry", "1280x800", "-t"
 #define MODKEY Mod1Mask
 #define TAGKEYS(KEY,TAG)                                                \
   { MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-    { MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-    { MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-    { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+  { MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
+  { MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
+  { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -72,7 +73,7 @@ static Key keys[] = {
   { MODKEY,                       XK_F2,               spawn,          CMD("pamixer", "-d", "10") },
   { MODKEY,                       XK_F3,               spawn,          CMD("pamixer", "-i", "10") },
   { 0,                            XF86XK_AudioMicMute, spawn,          CMD("pavucontrol-qt", "-t", "4") },
-  { MODKEY|ControlMask,           XK_l,                spawn,          CMD("i3lock", "-nec", normbgcolor) },
+  { MODKEY|ControlMask,           XK_l,                spawn,          SHCMD("~/.dwm/lock.sh") },
   { MODKEY,                       XK_b,                togglebar,      {0} },
   { MODKEY,                       XK_j,                focusstack,     {.i = +1 } },
   { MODKEY,                       XK_k,                focusstack,     {.i = -1 } },
