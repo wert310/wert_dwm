@@ -1,8 +1,8 @@
 #!/bin/bash
 
 mem() {
-    mem_used="$(free -h | grep 'Mem' | cut -c28-31)"
-    mem_total="$(free -h | grep Mem | cut -c17-19)"
+    mem_used="$(free -h | grep Mem | awk '{print $3 }')"
+    mem_total="$(free -h | grep Mem | awk '{print $2}')"
     echo -ne "Î ${mem_used}/${mem_total}"
 }
 
@@ -39,16 +39,17 @@ wifi() {
 }
 
 hddfree() {
-  hddfree="$(df -Ph /dev/nvme0n1p2 | awk '$3 ~ /[0-9]+/ {print $4}')"
+  hddfree="$(df -Ph / | awk '$3 ~ /[0-9]+/ {print $4}')"
   echo -ne "¨ ${hddfree}"
 }
 
 volume(){
-    if pamixer --get-mute >/dev/null; then
-      echo -en "í OFF"
-    else
-      echo -en "í $(pamixer --get-volume)%"
-    fi
+   # echo -en "í ?" 
+   if pamixer --get-mute >/dev/null; then
+     echo -en "í OFF"
+   else
+     echo -en "í $(pamixer --get-volume)%"
+   fi
  }
 
 datetime() {
@@ -58,6 +59,7 @@ datetime() {
 
 while true; do
   xsetroot -name "$(mem)  $(hddfree)  $(wifi)  $(volume)  $(power)  $(datetime)"
+  #echo "$(mem)  $(hddfree)  $(wifi)  $(volume)  $(power)  $(datetime)"
   battery_notify
   sleep 1
 done

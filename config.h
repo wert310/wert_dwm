@@ -22,8 +22,11 @@ static const Rule rules[] = {
   /* class                  instance  title       tags mask     isfloating   monitor */
   { NULL,                   NULL,     NULL,       0,            False,       -1 },
   { "Keepassx",             NULL,     NULL,       0,            True,        -1 },
+  { "keepassxc",            NULL,     NULL,       0,            True,        -1 },
   { "Seafile Client",       NULL,     NULL,       0,            True,        -1 },
   { "seafile-applet",       NULL,     NULL,       0,            True,        -1 },
+  { "pavucontrol",          NULL,     NULL,       0,            True,        -1 },
+  { "Pavucontrol",          NULL,     NULL,       0,            True,        -1 },
 };
 
 /* layout(s) */
@@ -72,7 +75,7 @@ static Key keys[] = {
   { MODKEY,                       XK_F1,               spawn,          CMD("pamixer", "-t") },
   { MODKEY,                       XK_F2,               spawn,          CMD("pamixer", "-d", "10") },
   { MODKEY,                       XK_F3,               spawn,          CMD("pamixer", "-i", "10") },
-  { 0,                            XF86XK_AudioMicMute, spawn,          CMD("pavucontrol-qt", "-t", "4") },
+  { 0,                            XF86XK_AudioMicMute, spawn,          CMD("pavucontrol", "-t", "4") },
   { MODKEY|ControlMask,           XK_l,                spawn,          SHCMD("~/.dwm/lock.sh") },
   { MODKEY,                       XK_b,                togglebar,      {0} },
   { MODKEY,                       XK_j,                focusstack,     {.i = +1 } },
