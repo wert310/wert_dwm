@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # wert_dwm startup script
+if [ -e /home/wert310/.nix-profile/etc/profile.d/nix.sh ]; then . /home/wert310/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 export QT_QPA_PLATFORMTHEME="qt5ct"
 export MOZ_USE_XINPUT2=1

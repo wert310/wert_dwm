@@ -1,0 +1,37 @@
+# Options
+set drawbox
+set color256
+set dircounts
+set icons
+set hidden
+
+# Shell opts
+set shell bash
+set shellopts '-eu'
+set ifs "\n"
+# Shell on enter
+map <enter> shell
+# Locations
+map gt cd /tmp
+# Sort
+map om :set sortby time; set info time; set reverse!
+map on :set sortby natural; set info; set reverse!
+# Preview script
+set previewer ~/.config/lf/preview.sh
+# Open command
+cmd open ${{
+    case $(file --mime-type "$f" -b) in
+        text/*)  $EDITOR $fx ;;
+        */pdf)   okular $fx 2> /dev/null > /dev/null & ;;
+        video/*) mpv -- $fx ;;
+        image/*) sxiv $fx ;;
+
+        # Default: look at file ext
+        *) case "$f" in
+               *.tar*|*.tgz|*.zip|*.rar|*.7z) ark $fx 2>&1 > /dev/null & ;;
+               *) echo "Unknown file: $fx" 1>&2 ;;
+           esac
+        ;;
+    esac
+}}
+

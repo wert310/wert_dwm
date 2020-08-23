@@ -747,6 +747,13 @@ void drawbar(Monitor *m) {
     drawtext(tags[i], col, urg & 1 << i);
     drawsquare(m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
                occ & 1 << i, urg & 1 << i, col);
+   // orange line under number
+   if (m->tagset[m->seltags] & 1 << i) {
+     XSetForeground(dpy, dc.gc, col[ColBorder]);
+     int h = dc.font.ascent + dc.font.descent;
+     XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h, dc.w, 2);
+   }
+
     dc.x += dc.w;
   }
   dc.w = blw = TEXTW(m->ltsymbol);
@@ -761,6 +768,11 @@ void drawbar(Monitor *m) {
     dc.w = m->ww - x;
   }
   drawtext(stext, dc.norm, False);
+  // Line under status
+  XSetForeground(dpy, dc.gc, dc.sel[ColBorder]);
+  int h1 = dc.font.ascent + dc.font.descent;
+  XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h1+1, dc.w, 1);
+
   if((dc.w = dc.x - x) > bh) {
     dc.x = x;
     if(m->sel) {

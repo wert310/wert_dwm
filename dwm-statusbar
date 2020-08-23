@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mem() {
     mem_used="$(free -h | grep Mem | awk '{print $3 }')"
