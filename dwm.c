@@ -944,6 +944,7 @@ unsigned long getcolor(const char *colstr) {
 
   if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
     die("error, cannot allocate color '%s'\n", colstr);
+  color.pixel |= 0xff << 24; /* fix transparent borders */
   return color.pixel;
 }
 
@@ -1733,7 +1734,7 @@ void tile(Monitor *m) {
     return;
 
   if(n > m->nmaster)
-    mw = m->nmaster ? m->ww * m->mfact : 0;
+    mw = m->nmaster ? m->ww * m->mfact : gappx;
   else
     mw = m->ww;
   for(i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
@@ -1744,7 +1745,7 @@ void tile(Monitor *m) {
     }
     else {
       h = (m->wh - ty) / (n - i);
-      resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), False);
+      resize(c, m->wx + mw - gappx, m->wy + ty, m->ww - mw - (2*c->bw) + gappx, h - (2*c->bw), False);
       ty += HEIGHT(c);
     }
 }

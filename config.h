@@ -2,15 +2,15 @@
 
 /* appearance */
 static const char font[]            = "-*-tamsynmod-medium-r-*-*-14-*-*-*-*-*-*-*";
-static const char normbordercolor[] = "#282828";
-static const char selbordercolor[]  = "#ec842d";
-static const char normbgcolor[]     = "#3c3836";
-static const char normfgcolor[]     = "#e0e0e0";
-static const char selbgcolor[]      = "#282828";
-static const char selfgcolor[]      = "#e0e0e0";
-static const unsigned int borderpx  = 0;        /* border pixel of windows */
+static const char normbordercolor[] = "#eee8d5";
+static const char normbgcolor[]     = "#fdf6e3";
+static const char normfgcolor[]     = "#586e75";
+static const char selbordercolor[]  = "#93a1a1";
+static const char selbgcolor[]      = "#657b83";
+static const char selfgcolor[]      = "#eee8d5";
+static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 8;        /* snap pixel */
-static const unsigned int gappx     = 10;        /* useless gap between windows */
+static const unsigned int gappx     = 24;        /* useless gap between windows */
 static const Bool monoclegap        = True;     /* show gap in monocle and single window mode */
 static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
@@ -28,6 +28,7 @@ static const Rule rules[] = {
   { "seafile-applet",       NULL,     NULL,       0,            True,        -1 },
   { "pavucontrol",          NULL,     NULL,       0,            True,        -1 },
   { "Pavucontrol",          NULL,     NULL,       0,            True,        -1 },
+  { "zoom",                 NULL,     "zoom",     0,            True,        -1 },
 };
 
 /* layout(s) */
@@ -40,12 +41,12 @@ static const Layout layouts[] = {
   /* symbol     arrange function */
   { "[]=",      tile },
   { "[M]",      monocle },
-  { "<><",      NULL }, // no layout -> floating
+  // { "<><",      NULL }, // no layout -> floating
 };
 
 /* scratchpad */
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "termite", "--geometry", "1280x800", "-t", scratchpadname, NULL };
+static const char *scratchpadcmd[] = { "alacritty", "-o", "window.dimensions.columns=142", "-o", "window.dimensions.lines=40", "-t", scratchpadname, NULL };
 
 /* key definitions */
 #define MODKEY Mod1Mask
@@ -61,7 +62,7 @@ static const char *scratchpadcmd[] = { "termite", "--geometry", "1280x800", "-t"
 
 /* commands */
 static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "termite", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 
 static Key keys[] = {
   /* modifier                     key                  function        argument */
@@ -70,7 +71,7 @@ static Key keys[] = {
   { MODKEY|ControlMask,           XK_t,                spawn,          {.v = termcmd } },
   { 0,                            XK_F10,              togglescratch,  {.v = scratchpadcmd } },
   { MODKEY,                       XK_o,                spawn,          CMD("networkmanager_dmenu") },
-  { MODKEY,                       XK_F12,              spawn,          CMD("sudo", "pm-suspend") },
+  { MODKEY,                       XK_F12,              spawn,          CMD("systemctl", "suspend") },
   { MODKEY,                       XK_F5,               spawn,          CMD("xbacklight", "-8") },
   { MODKEY,                       XK_F6,               spawn,          CMD("xbacklight", "+8") },
   { MODKEY,                       XK_F1,               spawn,          CMD("pamixer", "-t") },
@@ -78,7 +79,7 @@ static Key keys[] = {
   { MODKEY,                       XK_F3,               spawn,          CMD("pamixer", "-i", "10") },
   { 0,                            XF86XK_AudioMicMute, spawn,          CMD("pavucontrol", "-t", "4") },
   { MODKEY|ControlMask,           XK_l,                spawn,          SHCMD("~/.dwm/lock.sh") },
-  { MODKEY|ShiftMask,             XK_l,                spawn,          SHCMD("~/.dwm/lock.sh & sleep 2; sudo pm-suspend") },
+  { MODKEY|ShiftMask,             XK_l,                spawn,          SHCMD("~/.dwm/lock.sh & sleep 2; systemctl suspend") },
   { MODKEY,                       XK_b,                togglebar,      {0} },
   { MODKEY,                       XK_j,                focusstack,     {.i = +1 } },
   { MODKEY,                       XK_k,                focusstack,     {.i = -1 } },
