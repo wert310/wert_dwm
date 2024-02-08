@@ -40,6 +40,8 @@
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
+#include <X11/extensions/shape.h>
+#include <X11/extensions/Xrender.h>
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
@@ -61,10 +63,11 @@ enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetWMState,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetLast };     /* EWMH atoms */
+       NetWMWindowTypeDialog, NetWMIcon, NetLast };     /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
+enum BorderType { StateNormal, StateFocused };
 
 typedef union {
   int i;
@@ -219,6 +222,8 @@ static void run(void);
 static void scan(void);
 static Bool sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
+static void setborder(Client *c, enum BorderType state);
+static void setshape(Client *c);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, Bool fullscreen);
@@ -569,12 +574,14 @@ void configure(Client *c) {
   ce.above = None;
   ce.override_redirect = False;
   XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
+  setborder(c, (c->mon == selmon && c->mon->sel == c ? StateFocused : StateNormal));
 }
 
 void configurenotify(XEvent *e) {
   Monitor *m;
   XConfigureEvent *ev = &e->xconfigure;
   Bool dirty;
+  Client *c = wintoclient(ev->window);
 
   if(ev->window == root) {
     dirty = (sw != ev->width);
@@ -590,6 +597,8 @@ void configurenotify(XEvent *e) {
       focus(NULL);
       arrange(NULL);
     }
+  } else if (c) {
+     setborder(c, (c->mon == selmon && c->mon->sel == c ? StateFocused : StateNormal));
   }
 }
 
@@ -871,7 +880,8 @@ void focus(Client *c) {
     detachstack(c);
     attachstack(c);
     grabbuttons(c, True);
-    XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
+    //XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
+    setborder(c, StateFocused);
     setfocus(c);
   }
   else
@@ -1152,7 +1162,8 @@ void manage(Window w, XWindowAttributes *wa) {
 
   wc.border_width = c->bw;
   XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-  XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
+  //XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
+  //setborder(c, StateNormal);
   configure(c); /* propagates border_width, if size doesn't change */
   updatewindowtype(c);
   updatesizehints(c);
@@ -1519,6 +1530,115 @@ void sendmon(Client *c, Monitor *m) {
   arrange(NULL);
 }
 
+unsigned long
+multiplycolor(unsigned long col, double fact) {
+	int r = (int)(((0xFF0000 & col) >> 16) * fact);
+	int g = (int)(((0x00FF00 & col) >>  8) * fact);
+	int b = (int)(((0x0000FF & col) >>  0) * fact);
+	r = r > 255 ? 255 : r;
+	g = g > 255 ? 255 : g;
+	b = b > 255 ? 255 : b;
+	return (0xFF000000 & col) | (r << 16) | (g <<  8) | (b <<  0);
+}
+
+
+void setshape(Client *c) {
+  XRectangle r;
+  r.x = -1;
+  r.y = (int) -borderpx;
+  r.width = c->w + 2;
+  r.height = c->h + titlepx+2 + bottompx+2;
+  XShapeCombineRectangles(dpy, c->win, ShapeBounding, 0, 0, &r, 1, ShapeSet, Unsorted);
+}
+
+void setborder(Client *c, enum BorderType state) {
+  GC gc = XCreateGC(dpy, c->win, 0, NULL);
+  XWindowAttributes wa;
+  XGetWindowAttributes(dpy, c->win, &wa);
+  Pixmap border = XCreatePixmap(dpy, c->win, c->w + 2*c->bw, c->h + 2*c->bw, wa.depth);
+
+  XSetForeground(dpy, gc, dc.norm[ColBorder]);
+  XFillRectangle(dpy, border, gc, 0, 0, c->w + 2*c->bw, c->h + 2*c->bw);
+
+  unsigned long *color = (state == StateFocused) ? dc.sel : dc.norm;
+
+  // Title bar
+  int tb = titlepx;
+  XSetForeground(dpy, gc, color[ColBG]);
+  XFillRectangle(dpy, border, gc, 0, c->h+c->bw+1, c->w, tb);
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
+  XDrawRectangle(dpy, border, gc, 0, c->h+c->bw+1, c->w-1, tb-1);
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
+  XDrawLine(dpy, border, gc, 1, c->h+c->bw+1+tb-1, c->w-1,  c->h+c->bw+1+tb-1);
+  XDrawLine(dpy, border, gc, c->w-1, c->h+c->bw+1+tb-1, c->w-1,  c->h+c->bw+1);
+  // Title bar icon square
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
+  XDrawLine(dpy, border, gc, tb, c->h+c->bw+1, tb,  c->h+c->bw+1+tb-2);
+  XSetForeground(dpy, gc, dc.norm[ColBorder]);
+  XDrawLine(dpy, border, gc, tb+1, c->h+c->bw+1, tb+1,  c->h+c->bw+1+tb-1);
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
+  XDrawLine(dpy, border, gc, tb+2, c->h+c->bw+1, tb+2,  c->h+c->bw+1+tb-1);
+  // Title bar float mark
+  if (c->isfloating) {
+    XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
+    XDrawRectangle(dpy, border, gc, c->w-tb+2, c->h +c->bw + (tb/2)-2, 4, 4);
+    XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
+    XDrawLine(dpy, border, gc, c->w-tb+2, c->h +c->bw + (tb/2)+2, c->w-tb+6, c->h +c->bw + (tb/2)+2);
+    XDrawLine(dpy, border, gc, c->w-tb+6, c->h +c->bw + (tb/2)+2, c->w-tb+6, c->h +c->bw + (tb/2)-2);
+  }
+  // Bottom bar
+  int bh = bottompx;
+  XSetForeground(dpy, gc, color[ColBG]);
+  XFillRectangle(dpy, border, gc, 0, c->h+1, c->w, bh);
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
+  XDrawRectangle(dpy, border, gc, 0, c->h+1, c->w-1, bh-1);
+  XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
+  XDrawLine(dpy, border, gc, 1, c->h+1+bh-1, c->w-1,  c->h+1+bh-1);
+  XDrawLine(dpy, border, gc, c->w-1, c->h+1+bh-1, c->w-1,  c->h+1);
+  for (int off = 1; off < c->w; off += (c->w - 25*2 -1)) {
+    XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
+    XDrawLine(dpy, border, gc, off+24, c->h+1+bh-2, off+24,  c->h+2);
+    XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
+    XDrawLine(dpy, border, gc, off+25, c->h+1+bh-2, off+25,  c->h+2);
+  }
+  // Title
+  XSetForeground(dpy, gc, color[ColFG]);
+  char name[256] = {0};
+  strncpy(name, c->name, 255);
+  int len, olen = strlen(name);
+  for(len = olen; textnw(name, len) > c->w - 50; len--);
+  if (len) {
+    if (len < olen) for (int i=len; i>len - 3; name[--i] = '.');
+    int h = dc.font.ascent + dc.font.descent;
+    int x = c->w/2 - textnw(name,len)/2 + h/2;
+    int y = c->h+c->bw + titlepx/2 - h/2 + dc.font.ascent;
+    XDrawString(dpy, border, gc, x, y, name, len);
+  }
+  // Icon
+  {
+    Atom actualType;
+    int actualFormat;
+    unsigned long nItems, bytesAfter;
+    unsigned char *propData;
+
+    if (XGetWindowProperty(dpy, c->win, netatom[NetWMIcon], 0, 1024, False, AnyPropertyType,
+                           &actualType, &actualFormat, &nItems, &bytesAfter, &propData) == Success) {
+      unsigned long *iconData = (unsigned long *)propData;
+      int width = iconData[0];
+      int height = iconData[1];
+
+      if (width > 0 && height > 0) {
+        // TODO
+      }
+    }
+  }
+
+  XSetWindowBorderPixmap(dpy, c->win, border);
+  XFreePixmap(dpy,border);
+  XFreeGC(dpy,gc);
+  setshape(c);
+}
+
 void setclientstate(Client *c, long state) {
   long data[] = { state, None };
 
@@ -1625,6 +1745,10 @@ void setup(void) {
   sh = DisplayHeight(dpy, screen);
   bh = dc.h = dc.font.height + 2;
   updategeom();
+  int _1, _2;
+  if(!XShapeQueryExtension(dpy, &_1, &_2)) {
+    fprintf(stderr, "dwm: No SHAPE extension available, I'll look crappy.\n");
+  }
   /* init atoms */
   wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
   wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
@@ -1637,6 +1761,7 @@ void setup(void) {
   netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
   netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
   netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+  netatom[NetWMIcon] = XInternAtom(dpy, "_NET_WM_ICON", False);
   /* init cursors */
   cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
   cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
@@ -1813,7 +1938,8 @@ void unfocus(Client *c, Bool setfocus) {
   if(!c)
     return;
   grabbuttons(c, False);
-  XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+  //XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+  setborder(c, StateNormal);
   if(setfocus)
     XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 }

@@ -2,13 +2,15 @@
 
 /* appearance */
 static const char font[]            = "-*-tamsynmod-medium-r-*-*-14-*-*-*-*-*-*-*";
-static const char normbordercolor[] = "#eee8d5";
+static const char normbordercolor[] = "#212121"; // "#eee8d5";
 static const char normbgcolor[]     = "#fdf6e3";
 static const char normfgcolor[]     = "#586e75";
 static const char selbordercolor[]  = "#93a1a1";
 static const char selbgcolor[]      = "#657b83";
 static const char selfgcolor[]      = "#eee8d5";
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 16;        /* border pixel of windows */
+static const unsigned int titlepx   = borderpx - 2; /* title bar size */
+static const unsigned int bottompx  = borderpx / 3; /* bottom bar size */
 static const unsigned int snap      = 8;        /* snap pixel */
 static const unsigned int gappx     = 24;        /* useless gap between windows */
 static const Bool monoclegap        = True;     /* show gap in monocle and single window mode */
