@@ -53,8 +53,8 @@
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
-#define WIDTH(X)                ((X)->w + 2 * (X)->bw + gappx)
-#define HEIGHT(X)               ((X)->h + 2 * (X)->bw + gappx)
+#define WIDTH(X)                ((X)->w + 2 + gappx)
+#define HEIGHT(X)               ((X)->h + (X)->bw + (bottompx+2) + gappx)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
 
@@ -1216,7 +1216,7 @@ void monocle(Monitor *m) {
   if(n > 0) /* override layout symbol */
     snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
   for(c = nexttiled(m->clients); c; c = nexttiled(c->next))
-    resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, False);
+    resize(c, m->wx - (c->bw-1), m->wy, m->ww - 2, m->wh - c->bw - (bottompx+2), False);
 }
 
 void motionnotify(XEvent *e) {
@@ -1865,12 +1865,12 @@ void tile(Monitor *m) {
   for(i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
     if(i < m->nmaster) {
       h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-      resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), False);
+      resize(c, m->wx - (c->bw-1), m->wy + my, mw - 2, h - c->bw - (bottompx+2), False);
       my += HEIGHT(c);
     }
     else {
       h = (m->wh - ty) / (n - i);
-      resize(c, m->wx + mw - gappx, m->wy + ty, m->ww - mw - (2*c->bw) + gappx, h - (2*c->bw), False);
+      resize(c, m->wx + mw - gappx - (c->bw-1), m->wy + ty, m->ww - mw - 2 + gappx, h - c->bw - (bottompx+2), False);
       ty += HEIGHT(c);
     }
 }
