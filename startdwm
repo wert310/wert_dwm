@@ -14,7 +14,7 @@ xbacklight -set 8
 setxkbmap -variant altgr-intl us
 
 # Set touchscreen to control only the integrated LCD
-xinput --map-to-output 'ELAN Touchscreen' eDP1
+xinput --map-to-output 'ELAN Touchscreen' eDP-1
 
 wmname LG3D
 compton -b

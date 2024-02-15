@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
@@ -42,6 +44,7 @@
 #endif /* XINERAMA */
 #include <X11/extensions/shape.h>
 #include <X11/extensions/Xrender.h>
+#include <Imlib2.h>
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
@@ -209,6 +212,7 @@ static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void moveresize(const Arg *arg);
 static void movemouse(const Arg *arg);
+unsigned long multiplycolor(unsigned long col, double fact);
 static Client *nexttiled(Client *c);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
@@ -1392,8 +1396,8 @@ void resizeclient(Client *c, int x, int y, int w, int h) {
     /* Remove border and gap if layout is monocle or only one client */
     if ((!monoclegap || !selmon->showbar) && (selmon->lt[selmon->sellt]->arrange == monocle || n == 1)) {
       gapoffset = 0;
-      gapincr = -2 * borderpx;
-      wc.border_width = 0;
+      gapincr = 0;
+      //wc.border_width = 0;
     } else {
       gapoffset = gappx;
       gapincr = 2 * gappx;
@@ -1530,17 +1534,15 @@ void sendmon(Client *c, Monitor *m) {
   arrange(NULL);
 }
 
-unsigned long
-multiplycolor(unsigned long col, double fact) {
-	int r = (int)(((0xFF0000 & col) >> 16) * fact);
-	int g = (int)(((0x00FF00 & col) >>  8) * fact);
-	int b = (int)(((0x0000FF & col) >>  0) * fact);
-	r = r > 255 ? 255 : r;
-	g = g > 255 ? 255 : g;
-	b = b > 255 ? 255 : b;
-	return (0xFF000000 & col) | (r << 16) | (g <<  8) | (b <<  0);
+unsigned long multiplycolor(unsigned long col, double fact) {
+  int r = (int)(((0xFF0000 & col) >> 16) * fact);
+  int g = (int)(((0x00FF00 & col) >>  8) * fact);
+  int b = (int)(((0x0000FF & col) >>  0) * fact);
+  r = r > 255 ? 255 : r;
+  g = g > 255 ? 255 : g;
+  b = b > 255 ? 255 : b;
+  return (0xFF000000 & col) | (r << 16) | (g <<  8) | (b <<  0);
 }
-
 
 void setshape(Client *c) {
   XRectangle r;
@@ -1557,7 +1559,7 @@ void setborder(Client *c, enum BorderType state) {
   XGetWindowAttributes(dpy, c->win, &wa);
   Pixmap border = XCreatePixmap(dpy, c->win, c->w + 2*c->bw, c->h + 2*c->bw, wa.depth);
 
-  XSetForeground(dpy, gc, dc.norm[ColBorder]);
+  XSetForeground(dpy, gc, dc.norm[ColBorder]); // TODO: use 0 for border and ColBorder for just the 1px
   XFillRectangle(dpy, border, gc, 0, 0, c->w + 2*c->bw, c->h + 2*c->bw);
 
   unsigned long *color = (state == StateFocused) ? dc.sel : dc.norm;
@@ -1597,9 +1599,9 @@ void setborder(Client *c, enum BorderType state) {
   XDrawLine(dpy, border, gc, c->w-1, c->h+1+bh-1, c->w-1,  c->h+1);
   for (int off = 1; off < c->w; off += (c->w - 25*2 -1)) {
     XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
-    XDrawLine(dpy, border, gc, off+24, c->h+1+bh-2, off+24,  c->h+2);
+    XDrawLine(dpy, border, gc, off+24, c->h+1+bh-1, off+24,  c->h+1);
     XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
-    XDrawLine(dpy, border, gc, off+25, c->h+1+bh-2, off+25,  c->h+2);
+    XDrawLine(dpy, border, gc, off+25, c->h+1+bh-1, off+25,  c->h+2);
   }
   // Title
   XSetForeground(dpy, gc, color[ColFG]);
@@ -1611,26 +1613,69 @@ void setborder(Client *c, enum BorderType state) {
     if (len < olen) for (int i=len; i>len - 3; name[--i] = '.');
     int h = dc.font.ascent + dc.font.descent;
     int x = c->w/2 - textnw(name,len)/2 + h/2;
-    int y = c->h+c->bw + titlepx/2 - h/2 + dc.font.ascent;
-    XDrawString(dpy, border, gc, x, y, name, len);
+    int y = c->h+c->bw + titlepx/2 - h/2 + dc.font.ascent +1;
+    if(dc.font.set)
+      XmbDrawString(dpy, border, dc.font.set, gc, x, y, name, len);
+    else
+      XDrawString(dpy, border, gc, x, y, name, len);
   }
   // Icon
   {
-    Atom actualType;
-    int actualFormat;
-    unsigned long nItems, bytesAfter;
-    unsigned char *propData;
+    int format;
+    unsigned long n, extra, *p = NULL;
+    Atom real;
+    uint32_t dstw = 12, dsth = 12;
 
-    if (XGetWindowProperty(dpy, c->win, netatom[NetWMIcon], 0, 1024, False, AnyPropertyType,
-                           &actualType, &actualFormat, &nItems, &bytesAfter, &propData) == Success) {
-      unsigned long *iconData = (unsigned long *)propData;
-      int width = iconData[0];
-      int height = iconData[1];
+    if (XGetWindowProperty(dpy, c->win, netatom[NetWMIcon], 0L, LONG_MAX, False, AnyPropertyType,
+                           &real, &format, &n, &extra, (unsigned char **)&p) == Success) {
+      if (n == 0 || format != 32) goto exit;
+      unsigned long *bstp = p;
+      uint32_t w = *bstp++, h = *bstp++;
+      if (!w || !h || w >= 512 || h >= 512) goto exit;
 
-      if (width > 0 && height > 0) {
-        // TODO
+      for (uint32_t sz = w * h, i = 0; i < sz; ++i) {
+        uint32_t p = bstp[i];
+        uint8_t a = p >> 24u;
+        uint32_t rb = (a * (p & 0xFF00FFu)) >> 8u;
+        uint32_t g = (a * (p & 0x00FF00u)) >> 8u;
+        ((uint32_t *)bstp)[i] = (rb & 0xFF00FFu) | (g & 0x00FF00u) | (a << 24u);
       }
+
+      Imlib_Image origin = imlib_create_image_using_data(w, h, (DATA32 *)bstp);
+      if (!origin) goto exit;
+      imlib_context_set_image(origin);
+      imlib_image_set_has_alpha(1);
+      Imlib_Image scaled = imlib_create_cropped_scaled_image(0, 0, w, h, dstw, dsth);
+      imlib_free_image_and_decache();
+      if (!scaled) goto exit;
+      imlib_context_set_image(scaled);
+      imlib_image_set_has_alpha(1);
+      char* scaled_data =  (char *)imlib_image_get_data_for_reading_only();
+
+      XImage img = {
+        dstw, dsth, 0, ZPixmap, scaled_data,
+        ImageByteOrder(dpy), BitmapUnit(dpy), BitmapBitOrder(dpy), 32,
+        /*depth:*/32, 0, 32,
+        0, 0, 0
+      };
+      XInitImage(&img);
+
+      Pixmap pm = XCreatePixmap(dpy, c->win, dstw, dsth, 32);
+      GC gc = XCreateGC(dpy, pm, 0, NULL);
+      XPutImage(dpy, pm, gc, &img, 0, 0, 0, 0, dstw, dsth);
+      imlib_free_image_and_decache();
+      XFreeGC(dpy, gc);
+
+      Picture pic = XRenderCreatePicture(dpy, pm, XRenderFindStandardFormat(dpy, PictStandardARGB32), 0, NULL);
+      Picture bpic = XRenderCreatePicture(dpy, border, XRenderFindVisualFormat(dpy, wa.visual), 0, NULL);
+      XRenderComposite(dpy, PictOpOver, pic, None, bpic, 0, 0, 0, 0, 2, c->h+c->bw+3, dstw, dsth);
+
+      XFreePixmap(dpy, pm);
+      XRenderFreePicture(dpy, pic);
+      XRenderFreePicture(dpy, bpic);
     }
+  exit:
+    XFree(p);
   }
 
   XSetWindowBorderPixmap(dpy, c->win, border);

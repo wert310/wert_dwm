@@ -2,5 +2,5 @@ with import <nixpkgs> {};
 with xorg;
 pkgs.mkShell rec {
   name = "dwm";
-  buildInputs = [ libX11 libXinerama libXft libXcursor libXext ];
+  buildInputs = [ libX11 libXinerama libXft libXcursor libXext imlib2 ];
 }
