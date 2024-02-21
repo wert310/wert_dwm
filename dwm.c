@@ -752,7 +752,7 @@ void drawbar(Monitor *m) {
     occ |= c->tags;
     if(c->isurgent)
       urg |= c->tags;
-  }
+  };
   dc.x = 0;
   for(i = 0; i < LENGTH(tags); i++) {
     dc.w = TEXTW(tags[i]);
@@ -1559,7 +1559,7 @@ void setborder(Client *c, enum BorderType state) {
   XGetWindowAttributes(dpy, c->win, &wa);
   Pixmap border = XCreatePixmap(dpy, c->win, c->w + 2*c->bw, c->h + 2*c->bw, wa.depth);
 
-  XSetForeground(dpy, gc, dc.norm[ColBorder]); // TODO: use 0 for border and ColBorder for just the 1px
+  XSetForeground(dpy, gc, dc.norm[ColBorder]);
   XFillRectangle(dpy, border, gc, 0, 0, c->w + 2*c->bw, c->h + 2*c->bw);
 
   unsigned long *color = (state == StateFocused) ? dc.sel : dc.norm;
