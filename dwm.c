@@ -1568,6 +1568,12 @@ void setborder(Client *c, enum BorderType state) {
   int tb = titlepx;
   XSetForeground(dpy, gc, color[ColBG]);
   XFillRectangle(dpy, border, gc, 0, c->h+c->bw+1, c->w, tb);
+  // #define LERP(from, to, current) (from + (to - from) * current)
+  // for (int i=0; i<tb; ++i) { // rounded, osx style
+  //   XSetForeground(dpy, gc, multiplycolor(color[ColBG], LERP(1.20, 0.9,i/tb)));
+  //   XDrawLine(dpy, border, gc, 0, c->h+c->bw+1+i, c->w-1, c->h+c->bw+1+i);
+  // }
+  // #undef LERP
   XSetForeground(dpy, gc, multiplycolor(color[ColBG], 1.55));
   XDrawRectangle(dpy, border, gc, 0, c->h+c->bw+1, c->w-1, tb-1);
   XSetForeground(dpy, gc, multiplycolor(color[ColBG], 0.5));
