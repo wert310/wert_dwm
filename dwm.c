@@ -60,6 +60,7 @@
 #define HEIGHT(X)               ((X)->h + (X)->bw + (bottompx+2) + gappx)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
+#define STATEAUTO(c)            (c->mon == selmon && c->mon->sel == c ? StateFocused : StateNormal)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
@@ -578,7 +579,7 @@ void configure(Client *c) {
   ce.above = None;
   ce.override_redirect = False;
   XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
-  setborder(c, (c->mon == selmon && c->mon->sel == c ? StateFocused : StateNormal));
+  setborder(c, STATEAUTO(c));
 }
 
 void configurenotify(XEvent *e) {
@@ -602,7 +603,7 @@ void configurenotify(XEvent *e) {
       arrange(NULL);
     }
   } else if (c) {
-     setborder(c, (c->mon == selmon && c->mon->sel == c ? StateFocused : StateNormal));
+    setborder(c, STATEAUTO(c));
   }
 }
 
@@ -1348,6 +1349,7 @@ void propertynotify(XEvent *e) {
     }
     if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
       updatetitle(c);
+      setborder(c, STATEAUTO(c));
       if(c == c->mon->sel)
         drawbar(c->mon);
     }
