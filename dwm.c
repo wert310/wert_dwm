@@ -754,19 +754,21 @@ void drawbar(Monitor *m) {
     if(c->isurgent)
       urg |= c->tags;
   };
-  dc.x = 0;
+  // black border around the bar
+  dc.x = 1;
+  dc.y = 1;
   for(i = 0; i < LENGTH(tags); i++) {
     dc.w = TEXTW(tags[i]);
     col = m->tagset[m->seltags] & 1 << i ? dc.sel : dc.norm;
     drawtext(tags[i], col, urg & 1 << i);
     drawsquare(m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
                occ & 1 << i, urg & 1 << i, col);
-   // orange line under number
-   if (m->tagset[m->seltags] & 1 << i) {
-     XSetForeground(dpy, dc.gc, col[ColBorder]);
-     int h = dc.font.ascent + dc.font.descent;
-     XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h, dc.w, 2);
-   }
+   // // orange line under number
+   // if (m->tagset[m->seltags] & 1 << i) {
+   //   XSetForeground(dpy, dc.gc, col[ColBorder]);
+   //   int h = dc.font.ascent + dc.font.descent;
+   //   XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h, dc.w, 2);
+   // }
 
     dc.x += dc.w;
   }
@@ -776,16 +778,16 @@ void drawbar(Monitor *m) {
   x = dc.x;
   /* status is drawn on all monitors */
   dc.w = TEXTW(stext);
-  dc.x = m->ww - dc.w;
+  dc.x = m->ww - dc.w -1;
   if(dc.x < x) {
     dc.x = x;
     dc.w = m->ww - x;
   }
   drawtext(stext, dc.norm, False);
-  // Line under status
-  XSetForeground(dpy, dc.gc, dc.sel[ColBorder]);
-  int h1 = dc.font.ascent + dc.font.descent;
-  XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h1+1, dc.w, 1);
+  // // Line under status
+  // XSetForeground(dpy, dc.gc, dc.sel[ColBorder]);
+  // int h1 = dc.font.ascent + dc.font.descent;
+  // XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y+h1+1, dc.w, 1);
 
   if((dc.w = dc.x - x) > bh) {
     dc.x = x;
@@ -813,18 +815,30 @@ void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]
 
   XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
   x = (dc.font.ascent + dc.font.descent + 2) / 4;
-  if(filled)
-    XFillRectangle(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, x+1, x+1);
-  else if(empty)
+  if(filled) {
+    // XFillRectangle(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, x+1, x+1);
+    XSetForeground(dpy, dc.gc, multiplycolor(col[invert ? ColFG : ColBG], 1.55));
+    XDrawRectangle(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, x, x);
+    XSetForeground(dpy, dc.gc, multiplycolor(col[invert ? ColFG : ColBG], 0.5));
+    XDrawLine(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, dc.x+1+x, dc.y+1);
+    XDrawLine(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, dc.x+1, dc.y+1+x);
+  } else if(empty)
     XDrawRectangle(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, x, x);
 }
 
 void drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
   char buf[256];
   int i, x, y, h, len, olen;
+  unsigned long color = col[invert ? ColFG : ColBG];
 
-  XSetForeground(dpy, dc.gc, col[invert ? ColFG : ColBG]);
+  XSetForeground(dpy, dc.gc, color);
   XFillRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y, dc.w, dc.h);
+  XSetForeground(dpy, dc.gc, multiplycolor(color, col == dc.norm ? 1 : 1.55));
+  XDrawRectangle(dpy, dc.drawable, dc.gc, dc.x, dc.y, dc.w-1, dc.h-1);
+  XSetForeground(dpy, dc.gc, multiplycolor(color, col == dc.norm ? 1 : 0.5));
+  XDrawLine(dpy, dc.drawable, dc.gc, dc.x, dc.y+dc.h-1, dc.x+dc.w, dc.y+dc.h-1);
+  XDrawLine(dpy, dc.drawable, dc.gc, dc.x+dc.w-1, dc.y+dc.h-1, dc.x+dc.w-1, dc.y);
+
   if(!text)
     return;
   olen = strlen(text);
@@ -1797,6 +1811,7 @@ void setup(void) {
   sw = DisplayWidth(dpy, screen);
   sh = DisplayHeight(dpy, screen);
   bh = dc.h = dc.font.height + 2;
+  bh +=2; // black border around the bar
   updategeom();
   int _1, _2;
   if(!XShapeQueryExtension(dpy, &_1, &_2)) {
