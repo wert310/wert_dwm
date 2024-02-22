@@ -761,7 +761,8 @@ void drawbar(Monitor *m) {
     dc.w = TEXTW(tags[i]);
     col = m->tagset[m->seltags] & 1 << i ? dc.sel : dc.norm;
     drawtext(tags[i], col, urg & 1 << i);
-    drawsquare(m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+    drawsquare(((m == selmon && selmon->sel && selmon->sel->tags & 1 << i) ||
+                (occ & 1<<i && m->tagset[m->seltags] & 1 << i)),
                occ & 1 << i, urg & 1 << i, col);
    // // orange line under number
    // if (m->tagset[m->seltags] & 1 << i) {
