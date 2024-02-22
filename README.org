@@ -4,19 +4,4 @@ DWM config and patches
 ** Screenshot
 [[./images/screen.png]]
 
-** Installation
-- Install all the packages in =requirements.txt=
-- Add =30-touchpad.conf= in =/etc/X11/xorg.conf.d/=
-  #+BEGIN_EXAMPLE
-  Section "InputClass"
-          Identifier "MyTouchpad"
-          MatchIsTouchpad "on"
-          Driver "libinput"
-          Option "Tapping" "on"
-  	Option "ClickMethod" "clickfinger"
-  	Option "ScrollMethod" "edge"
-  EndSection
-  #+END_EXAMPLE
-- Add to =/etc/systemd/logind.conf= =HandlePowerKey=ignore=
-- Copy =termite_config= into =~/.config/termite/config=
 
