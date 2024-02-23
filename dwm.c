@@ -749,6 +749,9 @@ void drawbar(Monitor *m) {
   unsigned long *col;
   Client *c;
 
+  XSetForeground(dpy, dc.gc, dc.norm[ColBorder]);
+  XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, m->ww, bh+2);
+
   for(c = m->clients; c; c = c->next) {
     occ |= c->tags;
     if(c->isurgent)
